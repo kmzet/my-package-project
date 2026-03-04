@@ -1,0 +1,5 @@
+Migration Success!
+Source: GitHub Repository (kmzet/my-package-project)
+Destination: Google Artifact Registry (gdcv-images)
+Authentication: Workload Identity Federation (Secret-less)
+Timestamp: March 2026
