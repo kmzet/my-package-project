@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: image-pull-test
-  namespace: migration-ns
+  namespace: migration-ns //namespace isolation
 spec:
   replicas: 1
   selector:
@@ -13,9 +13,9 @@ spec:
       labels:
         app: test
     spec:
-      serviceAccountName: migration-ksa
+      serviceAccountName: migration-ksa //this shows that GKE/GDCV can auth to AR without a static imafe pull secret or JSON key
       containers:
       - name: my-app
         image: us-central1-docker.pkg.dev/gke-kueue/gdcv-images/my-package-project:latest
         # This keeps the container running so you can inspect it
-        command: ["sh", "-c", "while true; do sleep 30; done"]
+        command: ["sh", "-c", "while true; do sleep 30; done"] //this loop prevens the container from existing which allows for live auditing of the payload 
