@@ -20,9 +20,14 @@ gcloud iam workload-identity-pools providers create-oidc "github-provider" \
     --workload-identity-pool="github-pool" \
     --issuer-uri="[https://token.actions.githubusercontent.com](https://token.actions.githubusercontent.com)" \
     --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
-    --attribute-condition="assertion.repository_owner == 'YOUR GITHUB USERNAME'"
+    --attribute-condition="assertion.repository_owner == 'YOUR GITHUB USERNAME'" //The attribute-condition ensures that even if someone knows your Project Number, only repositories under your specific GitHub username can authenticate.
 
 # 3. Allow GitHub to act as the Service Account
 gcloud iam service-accounts add-iam-policy-binding "github-migrator-sa@YOUR-GCP-PROJECT-ID.iam.gserviceaccount.com" \
     --role="roles/iam.workloadIdentityUser" \
     --member="principalSet://[iam.googleapis.com/projects/YOUR-PROJECT-NUMBER/locations/global/workloadIdentityPools/github-pool/attribute.repository/YOUR-GITHUB-USERNAME/my-package-project](https://iam.googleapis.com/projects/YOUR-PROJECT-NUMBER/locations/global/workloadIdentityPools/github-pool/attribute.repository/YOUR-GITHUB-USERNAME/my-package-project)"
+
+# 4. Allow the identity to generate access tokens (Crucial for Docker Auth)
+gcloud iam service-accounts add-iam-policy-binding "github-migrator-sa@YOUR-PROJECT-ID.iam.gserviceaccount.com" \
+    --role="roles/iam.serviceAccountTokenCreator" \
+    --member="principalSet://iam.googleapis.com/projects/YOUR-PROJECT-NUMBER/locations/global/workloadIdentityPools/github-pool/attribute.repository/YOUR-GITHUB-USERNAME/my-package-project"
