@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image-pull-test
+  namespace: migration-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      serviceAccountName: migration-ksa
+      containers:
+      - name: my-app
+        image: us-central1-docker.pkg.dev/gke-kueue/gdcv-images/my-package-project:latest
+        # This keeps the container running so you can inspect it
+        command: ["sh", "-c", "while true; do sleep 30; done"]
