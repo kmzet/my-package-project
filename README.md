@@ -31,3 +31,25 @@ gcloud iam service-accounts add-iam-policy-binding "github-migrator-sa@YOUR-GCP-
 gcloud iam service-accounts add-iam-policy-binding "github-migrator-sa@YOUR-PROJECT-ID.iam.gserviceaccount.com" \
     --role="roles/iam.serviceAccountTokenCreator" \
     --member="principalSet://iam.googleapis.com/projects/YOUR-PROJECT-NUMBER/locations/global/workloadIdentityPools/github-pool/attribute.repository/YOUR-GITHUB-USERNAME/my-package-project"
+
+## Artifactory to GAR Migration
+To replicate this with existing JFrog workloads, follow the "Pull-Tag-Push" pattern or use the GCRane tool for large-scale migrations.
+
+### 1. Authenticate to both Registries
+```bash
+# Auth to JFrog
+docker login [JFROG_URL]
+
+# Auth to Google Artifact Registry (Secret-less)
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+# Pull from JFrog
+docker pull [JFROG_URL]/my-app:v1
+
+# Retag for Google
+docker tag [JFROG_URL]/my-app:v1 us-central1-docker.pkg.dev/gke-kueue/gdcv-images/my-app:v1
+
+# Push to GAR
+docker push us-central1-docker.pkg.dev/gke-kueue/gdcv-images/my-app:v1
+
+For hundreds of images gcrane can be used to sync registries directly 
